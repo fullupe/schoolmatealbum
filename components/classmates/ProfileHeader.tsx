@@ -1,7 +1,7 @@
 import { Classmate } from "@/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
+import { ArrowLeft, Facebook, Instagram, Linkedin, Route, Twitter } from "lucide-react";
 
 interface ProfileHeaderProps {
   classmate: Classmate;
@@ -21,11 +21,13 @@ export default function ProfileHeader({ classmate }: ProfileHeaderProps) {
       
       <div className="max-w-7xl mx-auto px-4 md:px-8 relative">
         {/* Back Button */}
-        <div className="absolute top-4 left-4 md:left-8 z-10">
+        <div className="absolute top-4 left-4 md:left-8 z-50 cursor-pointer">
           <Link href="/">
             <Button size="sm" variant="outline" className="bg-black/30 text-white border-white/20 hover:bg-black/50 hover:text-white">
               <ArrowLeft className="mr-2 h-4 w-4" />
+            
               Back to Album
+        
             </Button>
           </Link>
         </div>
