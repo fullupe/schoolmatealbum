@@ -83,7 +83,7 @@ export const classmates: Classmate[] = [
     name: "Fredrick Agyemang",
     oldPicture: defaultImg,
     newPicture: "https://res.cloudinary.com/fullupe/image/upload/v1745963561/SAGYIMASE_1999/uybwgqzcz7vnxcdej8i3.jpg",
-    profession: "Marketing Director",
+    profession: "Electronics Eng.",
     company: "Self Employed ",
     location: "Accra, Ghana",
     bio: "A highly skilled electronics repairer with ten years in the industry, I specialize in the meticulous troubleshooting and repair of intricate electronic systems. My proficiency extends to component-level repairs, ensuring precision and lasting solutions.",
