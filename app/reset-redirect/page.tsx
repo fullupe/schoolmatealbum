@@ -1,4 +1,4 @@
-// app/reset-redirect/page.tsx - FIXED VERSION
+// app/reset-redirect/page.tsx - COMPLETE WORKING VERSION
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -33,12 +33,20 @@ export default function ResetRedirectPage() {
 
     console.log('Extracted token:', extractedToken);
 
-    // MODIFIED: Don't check for type parameter, just check if token exists
     if (extractedToken) {
       setToken(extractedToken);
       
-      // Try to redirect to app
-      window.location.href = `myapp://reset-password?token=${encodeURIComponent(extractedToken)}`;
+      // Detect if we're likely in a development environment
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+      const isDev = process.env.NODE_ENV === 'development';
+      
+      // Use Expo Go scheme for development, custom scheme for production
+      const scheme = isLocalhost || isDev 
+        ? 'exp://192.168.1.100:8081/--/reset-password' 
+        : 'myapp://reset-password';
+      
+      window.location.href = `${scheme}?token=${encodeURIComponent(extractedToken)}`;
       
       // Show fallback if app doesn't open
       setTimeout(() => {
@@ -51,7 +59,16 @@ export default function ResetRedirectPage() {
 
   const handleOpenApp = () => {
     if (token) {
-      window.location.href = `myapp://reset-password?token=${encodeURIComponent(token)}`;
+      // Use the same logic to determine the scheme
+      const isLocalhost = window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1';
+      const isDev = process.env.NODE_ENV === 'development';
+      
+      const scheme = isLocalhost || isDev 
+        ? 'exp://192.168.1.100:8081/--/reset-password' 
+        : 'myapp://reset-password';
+      
+      window.location.href = `${scheme}?token=${encodeURIComponent(token)}`;
     }
   };
 
