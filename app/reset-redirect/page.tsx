@@ -11,25 +11,45 @@ export default function ResetRedirectPage() {
   const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
-    // Get ALL parameters for debugging
-    const params: Record<string, string> = {};
-    searchParams.forEach((value, key) => {
-      params[key] = value;
-    });
+    // Function to extract parameters from URL
+    const extractParameters = () => {
+      // 1. Check query parameters
+      const queryToken = searchParams.get('token') || 
+                         searchParams.get('access_token') ||
+                         searchParams.get('code');
+      
+      const queryType = searchParams.get('type') || 
+                        searchParams.get('message_type');
 
-    const tokenParam = searchParams.get('token') || params.token;
-    const type = searchParams.get('type') || params.type;
+      // 2. Check hash parameters (common with OAuth flows)
+      const hash = window.location.hash.substring(1);
+      const hashParams = new URLSearchParams(hash);
+      const hashToken = hashParams.get('token') || 
+                        hashParams.get('access_token') ||
+                        hashParams.get('code');
+      
+      const hashType = hashParams.get('type') || 
+                       hashParams.get('message_type');
 
-    const debugText = `Received params: ${JSON.stringify(params)} | token: ${tokenParam} | type: ${type}`;
-    console.log(debugText);
-    setDebugInfo(debugText);
+      // 3. Use whichever has values
+      return {
+        token: queryToken || hashToken,
+        type: queryType || hashType
+      };
+    };
 
-    if (type === 'recovery' && tokenParam) {
-      setToken(tokenParam);
+    const { token: extractedToken, type: extractedType } = extractParameters();
+
+    console.log('Extracted parameters:', { extractedToken, extractedType });
+    console.log('Full URL:', window.location.href);
+
+    if (extractedType === 'recovery' && extractedToken) {
+      setToken(extractedToken);
       
       // Try to redirect to app
-      window.location.href = `myapp://reset-password?token=${encodeURIComponent(tokenParam)}`;
+      window.location.href = `myapp://reset-password?token=${encodeURIComponent(extractedToken)}`;
       
+      // Show fallback if app doesn't open
       setTimeout(() => {
         if (!document.hidden) {
           setShowFallback(true);
