@@ -1,4 +1,4 @@
-// app/reset-redirect/page.tsx - IMPROVED VERSION
+// app/reset-redirect/page.tsx - FIXED VERSION
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -6,44 +6,35 @@ import { useSearchParams } from 'next/navigation';
 
 export default function ResetRedirectPage() {
   const searchParams = useSearchParams();
-  const [showFallback, setShowFallback] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [debugInfo, setDebugInfo] = useState<string>('');
+  const [showFallback, setShowFallback] = useState(false);
 
   useEffect(() => {
     // Function to extract parameters from URL
     const extractParameters = () => {
-      // 1. Check query parameters
+      // Check query parameters
       const queryToken = searchParams.get('token') || 
                          searchParams.get('access_token') ||
                          searchParams.get('code');
       
-      const queryType = searchParams.get('type') || 
-                        searchParams.get('message_type');
-
-      // 2. Check hash parameters (common with OAuth flows)
+      // Check hash parameters
       const hash = window.location.hash.substring(1);
       const hashParams = new URLSearchParams(hash);
       const hashToken = hashParams.get('token') || 
                         hashParams.get('access_token') ||
                         hashParams.get('code');
-      
-      const hashType = hashParams.get('type') || 
-                       hashParams.get('message_type');
 
-      // 3. Use whichever has values
       return {
-        token: queryToken || hashToken,
-        type: queryType || hashType
+        token: queryToken || hashToken
       };
     };
 
-    const { token: extractedToken, type: extractedType } = extractParameters();
+    const { token: extractedToken } = extractParameters();
 
-    console.log('Extracted parameters:', { extractedToken, extractedType });
-    console.log('Full URL:', window.location.href);
+    console.log('Extracted token:', extractedToken);
 
-    if (extractedType === 'recovery' && extractedToken) {
+    // MODIFIED: Don't check for type parameter, just check if token exists
+    if (extractedToken) {
       setToken(extractedToken);
       
       // Try to redirect to app
@@ -57,23 +48,6 @@ export default function ResetRedirectPage() {
       }, 2000);
     }
   }, [searchParams]);
-
-   // For testing: Display debug info
-   if (process.env.NODE_ENV === 'development') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 max-w-md w-full text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Debug Information</h2>
-          <pre className="text-white/80 text-sm text-left whitespace-pre-wrap">
-            {debugInfo || 'No parameters received yet...'}
-          </pre>
-          <p className="text-white/60 mt-4">
-            Check browser console for more details.
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   const handleOpenApp = () => {
     if (token) {
