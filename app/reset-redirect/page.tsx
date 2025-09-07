@@ -10,6 +10,31 @@ export default function ResetRedirectPage() {
   const [isRedirecting, setIsRedirecting] = useState(true);
   const [isClient, setIsClient] = useState(false);
 
+
+
+
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  
+  // Log all parameters for debugging
+  useEffect(() => {
+    const params: string[] = [];
+    searchParams.forEach((value, key) => {
+      params.push(`${key}=${value}`);
+    });
+    
+    const debugText = `Received parameters: ${params.join(', ')}`;
+    console.log(debugText);
+    setDebugInfo(debugText);
+  }, [searchParams]);
+
+
+
+
+
+
+
+
+
   useEffect(() => {
     setIsClient(true);
   }, []);
@@ -65,14 +90,33 @@ export default function ResetRedirectPage() {
 
   if (!token || !type) {
     return (
+      <>
       <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
         <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 max-w-md w-full text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Invalid Reset Link</h2>
           <p className="text-white/80">The password reset link is invalid or has expired.</p>
         </div>
       </div>
+
+
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
+      <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 max-w-md w-full text-center text-white">
+        <h2 className="text-2xl font-bold mb-4">Debug Information</h2>
+        <p className="text-white/80 mb-4">{debugInfo}</p>
+        <p className="text-white/60">Check browser console for more details.</p>
+      </div>
+    </div>
+
+      
+
+      </>
+
+
+
     );
   }
+
+
 
   return (
     <>
