@@ -8,10 +8,21 @@ export default function ResetRedirectPage() {
   const searchParams = useSearchParams();
   const [showFallback, setShowFallback] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
-    const tokenParam = searchParams.get('token');
-    const type = searchParams.get('type');
+    // Get ALL parameters for debugging
+    const params: Record<string, string> = {};
+    searchParams.forEach((value, key) => {
+      params[key] = value;
+    });
+
+    const tokenParam = searchParams.get('token') || params.token;
+    const type = searchParams.get('type') || params.type;
+
+    const debugText = `Received params: ${JSON.stringify(params)} | token: ${tokenParam} | type: ${type}`;
+    console.log(debugText);
+    setDebugInfo(debugText);
 
     if (type === 'recovery' && tokenParam) {
       setToken(tokenParam);
@@ -19,7 +30,6 @@ export default function ResetRedirectPage() {
       // Try to redirect to app
       window.location.href = `myapp://reset-password?token=${encodeURIComponent(tokenParam)}`;
       
-      // Show fallback if app doesn't open after 2 seconds
       setTimeout(() => {
         if (!document.hidden) {
           setShowFallback(true);
@@ -27,6 +37,23 @@ export default function ResetRedirectPage() {
       }, 2000);
     }
   }, [searchParams]);
+
+   // For testing: Display debug info
+   if (process.env.NODE_ENV === 'development') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-6">
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 max-w-md w-full text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">Debug Information</h2>
+          <pre className="text-white/80 text-sm text-left whitespace-pre-wrap">
+            {debugInfo || 'No parameters received yet...'}
+          </pre>
+          <p className="text-white/60 mt-4">
+            Check browser console for more details.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const handleOpenApp = () => {
     if (token) {
